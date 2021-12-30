@@ -147,7 +147,8 @@ p.dump = function(value, call_indent)
   elseif type (value) == "userdata" then
     output = "userdata"
   else 
-    output =  value
+    if tonumber(value) then output = value
+    else output = '"' .. value .. '"' end
   end
   return output 
 end
