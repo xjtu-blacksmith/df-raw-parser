@@ -24,7 +24,7 @@ p.parse = function(raw)
         if attr == "OBJECT" then
           data.val = val  -- database type
         else  -- base item
-          p.plug_value(data, val, "")  -- add item with empty value
+          val = p.plug_value(data, val, "")  -- add item with empty value
           link = {}  -- clear the link
           anchor = val  -- recover link list
         end
@@ -34,7 +34,7 @@ p.parse = function(raw)
           table.insert(link, anchor)
         end
         local cursor = p.fw_link(data, link)
-        p.plug_value(cursor, attr, val)
+        attr = p.plug_value(cursor, attr, val)
         anchor = attr -- replace the anchor
 
       else -- rollback to higher level
@@ -42,7 +42,7 @@ p.parse = function(raw)
           table.remove(link, #link)  -- rollback to the level on the top
         end
         local cursor = p.fw_link(data, link)
-        p.plug_value(cursor, attr, val)
+        attr = p.plug_value(cursor, attr, val)
         anchor = attr
       end
 
@@ -63,32 +63,45 @@ p.fw_link = function(data, link)
   return cursor
 end
 
-p.plug_value = function(cursor, attr, val)
-  local str = val
-  if string.find(str, ':') then  -- colon still exists
+p.plug_value = function(cursor, attr, value)
+
+  -- check if multiple values exist
+  local val = value
+  if string.find(val, ':') then  -- colon still exists
     local val_table = {}  -- store separated value
-    while #str > 0 do
-      local _, r = string.find(str, "[%a%d_ ]+")  -- usually the left one is 1
+    while #val > 0 do
+      local _, r = string.find(val, "[%a%d_ ]+")  -- usually the left one is 1
       if r then
-        table.insert(val_table, string.sub(str, 1, r))
-        str = str:sub(r+2)
+        table.insert(val_table, string.sub(val, 1, r))
+        val = val:sub(r+2)
       end
     end
-    str = val_table
-  end
-  -- check color string
-  local i = 1
-  while #str>2 and i<=#str do
-    if tonumber(str[i]) and tonumber(str[i+1]) and tonumber(str[i+2]) then
-      str[i] = str[i] .. ':' .. str[i+1] .. ':' .. str[i+2]
-      table.remove(str, i+1)
-      table.remove(str, i+1)
+    val = val_table
+
+    -- check color string
+    local i = 1
+    while #val >2 and i<=#val do
+      if tonumber(val[i]) and tonumber(val[i+1]) and tonumber(val[i+2]) then
+        val[i] = val[i] .. ':' .. val[i+1] .. ':' .. val[i+2]
+        table.remove(val, i+1)
+        table.remove(val, i+1)
+      end
+      i = i+1
     end
-    i = i+1
   end
-  cursor[attr] = {}
-  cursor[attr].val = str
-  cursor[attr].tab = {}
+
+  -- check template
+  local key = attr
+  if key == 'USE_MATERIAL_TEMPLATE' then
+    key = key .. '/' .. val[1]  -- connect the key with the template type
+    table.remove(val, 1) -- remove template type name from table
+  end
+
+  -- plug in key-val pair
+  cursor[key] = {}
+  cursor[key].val = val 
+  cursor[key].tab = {}
+  return key  -- for modification
 end
 
 p.read_file = function(path)
