@@ -4,42 +4,53 @@ p.parse = function(raw)
   local data = {}
   local cur_level = 0
   local link = {}  -- buffer for current parents' link
+  local anchor = ""  -- last anchor to be added
   for i, line in ipairs(raw) do
-    if string.match(line, "%[[%a%d_: ]+%]") then
-      local _, level = string.gsub(line, '\t', "")  -- count level by tab
-      if not level then level = 0 end
-      l, r = string.find(line, "%[[%a_]+")
-      attr = string.sub(line, l+1, r)  -- acquire attr
-      line = line:sub(r+2)  -- remove attr
-      l, _ = string.find(line, ']')  -- find the end of token
+    local _, level = string.gsub(line, '\t', "")  -- count level by tab
+    if not level then level = 0 end
+    for token in string.gmatch(line, "%[[%a%d_: ]+%]") do
+
+      l, r = token:find("%[[%a_]+")
+      attr = token:sub(l+1, r)  -- acquire attr
+      l, r = token:find(':.*]')  -- find the end of token
       if l then
-        val = string.sub(line, 1, l-1)  -- get val
+        val = token:sub(l+1, r-1)  -- get val, without the first charcter (: or ])
       else
         val = ""  -- token with no value
       end
-      if level == 0 then
+
+      -- add item (attr - val) to database
+      if level == 0 then  -- highest level
         if attr == "OBJECT" then
-          data.val = val  -- database property
-        else
-          data[val] = {}
-          data[val].val = "" -- not attributes
-          data[val].tab = {} -- a new item list
-          link = { val }  -- recover link list
+          data.val = val  -- database type
+        else  -- base item
+          p.plug_value(data, val, "")  -- add item with empty value
+          link = {}  -- clear the link
+          anchor = val  -- recover link list
         end
+      
       elseif level >= cur_level then
+        if level > cur_level then
+          table.insert(link, anchor)
+        end
         local cursor = p.fw_link(data, link)
         p.plug_value(cursor, attr, val)
-        if not level == cur_level then table.insert(link, attr) end
-      else -- rollback to lower level
-        for _ = level+1, cur_level-1 do
+        anchor = attr -- replace the anchor
+
+      else -- rollback to higher level
+        for _ = level+1, cur_level do
           table.remove(link, #link)  -- rollback to the level on the top
         end
         local cursor = p.fw_link(data, link)
         p.plug_value(cursor, attr, val)
-        table.insert(link, attr) -- add link
+        anchor = attr
       end
+
       cur_level = level  -- reset level buffer
+      -- print(attr, val, level, anchor, p.dump(link)) 
     end
+  
+  -- if i > 50 then break end
   end
   return data
 end
