@@ -144,7 +144,7 @@ p.split = function(input, sep)
 end
 
 -- source: <https://stackoverflow.com/a/55653719>
-p.dump = function(value, call_indent)
+p.dump = function(value, call_indent, compress)
   if not call_indent then 
     call_indent = ""
   end
@@ -155,14 +155,22 @@ p.dump = function(value, call_indent)
       local first = true
       for inner_key, inner_value in pairs ( value ) do
         if not first then 
-          output = output .. ", "
+          output = output .. ","
+          if not compress then output = output .. "" end
         else
           first = false
         end
-        output = output .. "\n" .. indent
-        output = output  .. '["' .. inner_key .. '"]' .. " = " .. p.dump ( inner_value, indent ) 
+        if not compress then
+          output = output .. "\n" .. indent
+        end
+        local equal = "="
+        if not compress then equal = " = " end
+        output = output  .. '["' .. inner_key .. '"]' .. equal .. p.dump ( inner_value, indent, compress ) 
       end
-      output = output ..  "\n" .. call_indent .. "}"
+      if not compress then
+        output = output ..  "\n" .. call_indent
+      end
+      output = output .. "}"
   elseif type (value) == "userdata" then
     output = "userdata"
   else 
