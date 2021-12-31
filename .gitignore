@@ -1,3 +1,4 @@
 *.txt
 !raw/*.txt
 .vscode/
+out/
