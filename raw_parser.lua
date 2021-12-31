@@ -102,11 +102,13 @@ p.plug_value = function(cursor, attr, value)
     while #val >2 and i<=#val do
       if p.is_color(val[i], val[i+1], val[i+2]) then
         val[i] = val[i] .. ':' .. val[i+1] .. ':' .. val[i+2]
-        table.remove(val, i+1)
+        table.remove(val, i+2)
         table.remove(val, i+1)
       end
       i = i+1
     end
+    -- if only one element, reset to single val
+    if #val == 1 then val = val[1] end
   end
 
   -- check template
