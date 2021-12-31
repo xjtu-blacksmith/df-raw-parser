@@ -8,6 +8,7 @@ p.parse = function(raw)
   for i, line in ipairs(raw) do
     local _, level = string.gsub(line, '\t', "")  -- count level by tab
     if not level then level = 0 end
+    local first_token_in_line = true
     for token in string.gmatch(line, "%[[%a%d_: ]+%]") do
 
       l, r = token:find("%[[%a_]+")
@@ -19,33 +20,40 @@ p.parse = function(raw)
         val = ""  -- token with no value
       end
 
+      -- preprocessing
       -- add item (attr - val) to database
-      if level == 0 then  -- highest level
-        if attr == "OBJECT" then
-          data.val = val  -- database type
-        else  -- base item
-          val = p.plug_value(data, val, "")  -- add item with empty value
-          link = {}  -- clear the link
-          anchor = val  -- recover link list
+      if attr == "OBJECT" then
+        data.val = val
+        break  -- directly move to next line
+      end
+      if level == 0 then
+        if attr == data.val then  -- basic item
+          attr = val
+          val = ""
+          link = {}  -- clear link list
+        else  -- not basic item, absent tab appears
+          level = 1
         end
-      
-      elseif level >= cur_level then
-        if level > cur_level then
-          table.insert(link, anchor)
-        end
-        local cursor = p.fw_link(data, link)
-        attr = p.plug_value(cursor, attr, val)
-        anchor = attr -- replace the anchor
-
-      else -- rollback to higher level
-        for _ = level+1, cur_level do
-          table.remove(link, #link)  -- rollback to the level on the top
-        end
-        local cursor = p.fw_link(data, link)
-        attr = p.plug_value(cursor, attr, val)
-        anchor = attr
+      end
+      if (not first_token_in_line) and (not attr == anchor) then  -- neither the first token in line nor the same as before
+        level = level -  1  -- reset level to higher level
       end
 
+      -- processing link list
+      if level > cur_level then  -- lower level, add last anchor to link
+        table.insert(link, anchor)
+      elseif level < cur_level then  -- rollback to higher level
+        for _ = level, cur_level-1 do
+          table.remove(link, #link)  -- rollback to the level on the top
+        end
+      end
+
+      -- plug token into database
+      local cursor = p.fw_link(data, link)
+      attr = p.plug_value(cursor, attr, val)
+      anchor = attr -- reset the anchor
+
+      first_token_in_line = false  -- no longer the first one
       cur_level = level  -- reset level buffer
       -- print(attr, val, level, anchor, p.dump(link)) 
     end
