@@ -129,18 +129,6 @@ p.read_file = function(path)
   return texts
 end
 
--- source: <https://www.tutorialspoint.com/how-to-split-a-string-in-lua-programming>
-p.split = function(input, sep)
-  if sep == nil then
-      sep = "%s"
-   end
-   local t = {}
-   for str in string.match(input, "([^" .. sep .. "]+)") do
-      table.insert(t, str)
-   end
-   return t
-end
-
 -- source: <https://stackoverflow.com/a/55653719>
 p.dump = function(value, call_indent, compress)
   if not call_indent then 
