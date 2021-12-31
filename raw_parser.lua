@@ -7,7 +7,9 @@ p.parse = function(raw)
   local anchor = ""  -- last anchor to be added
   local type = ""
   for i, line in ipairs(raw) do
-    local _, level = string.gsub(line, '\t', "")  -- count level by tab
+    local heading_space = string.match(line, "^%s+")
+    if not heading_space then heading_space = "" end
+    local _, level = string.gsub(heading_space, '\t', "")  -- count level by tab
     if not level then level = 0 end
     for token in string.gmatch(line, "%[[%a%d_: ]+%]") do
 
