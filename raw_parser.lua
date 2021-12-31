@@ -1,7 +1,10 @@
 local p = {}
 
-p.parse = function(raw)
-  local data = {}
+p.parse = function(raw, given_data)
+  local data = given_data
+  if not data then  -- data not given, create from empty table
+    data = {}
+  end
   local cur_level = 0
   local link = {}  -- buffer for current parents' link
   local anchor = ""  -- last anchor to be added
@@ -19,7 +22,7 @@ p.parse = function(raw)
       if l then
         val = token:sub(l+1, r-1)  -- get val, without the first charcter (: or ])
       else
-        val = ""  -- token with no value
+        val = "TRUE"  -- token with no value, just indicate exists
       end
 
       -- preprocessing
