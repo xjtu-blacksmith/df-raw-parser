@@ -63,6 +63,17 @@ p.fw_link = function(data, link)
   return cursor
 end
 
+p.is_color = function( a, b, c )
+  if tonumber(a) and tostring(a):len() == 1 then
+    if tonumber(b) and tostring(b):len() == 1 then
+      if tonumber(c) and tostring(c):len() == 1 then
+        return true
+      end
+    end
+  end
+  return false
+end
+
 p.plug_value = function(cursor, attr, value)
 
   -- check if multiple values exist
@@ -81,7 +92,7 @@ p.plug_value = function(cursor, attr, value)
     -- check color string
     local i = 1
     while #val >2 and i<=#val do
-      if tonumber(val[i]) and tonumber(val[i+1]) and tonumber(val[i+2]) then
+      if p.is_color(val[i], val[i+1], val[i+2]) then
         val[i] = val[i] .. ':' .. val[i+1] .. ':' .. val[i+2]
         table.remove(val, i+1)
         table.remove(val, i+1)
@@ -141,13 +152,13 @@ p.dump = function(value, call_indent)
           first = false
         end
         output = output .. "\n" .. indent
-        output = output  .. inner_key .. " = " .. p.dump ( inner_value, indent ) 
+        output = output  .. '["' .. inner_key .. '"]' .. " = " .. p.dump ( inner_value, indent ) 
       end
       output = output ..  "\n" .. call_indent .. "}"
   elseif type (value) == "userdata" then
     output = "userdata"
   else 
-    if tonumber(value) then output = value
+    if tonumber(value) or not value then output = value
     else output = '"' .. value .. '"' end
   end
   return output 
