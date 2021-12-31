@@ -5,6 +5,7 @@ p.parse = function(raw)
   local cur_level = 0
   local link = {}  -- buffer for current parents' link
   local anchor = ""  -- last anchor to be added
+  local type = ""
   for i, line in ipairs(raw) do
     local _, level = string.gsub(line, '\t', "")  -- count level by tab
     if not level then level = 0 end
@@ -23,13 +24,13 @@ p.parse = function(raw)
       -- preprocessing
       -- add item (attr - val) to database
       if attr == "OBJECT" then
-        data.val = val
+        type = val
         break  -- directly move to next line
       end
       if level == 0 then
-        if attr == data.val then  -- basic item
+        if attr == type then  -- basic item
           attr = val
-          val = ""
+          val = type  -- set value as item type
           link = {}  -- clear link list
         else  -- not basic item, absent tab appears
           level = 1
