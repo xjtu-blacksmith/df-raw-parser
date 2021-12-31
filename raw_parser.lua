@@ -9,7 +9,6 @@ p.parse = function(raw)
   for i, line in ipairs(raw) do
     local _, level = string.gsub(line, '\t', "")  -- count level by tab
     if not level then level = 0 end
-    local first_token_in_line = true
     for token in string.gmatch(line, "%[[%a%d_: ]+%]") do
 
       l, r = token:find("%[[%a_]+")
@@ -36,9 +35,6 @@ p.parse = function(raw)
           level = 1
         end
       end
-      if (not first_token_in_line) and (not attr == anchor) then  -- neither the first token in line nor the same as before
-        level = level -  1  -- reset level to higher level
-      end
 
       -- processing link list
       if level > cur_level then  -- lower level, add last anchor to link
@@ -54,7 +50,6 @@ p.parse = function(raw)
       attr = p.plug_value(cursor, attr, val)
       anchor = attr -- reset the anchor
 
-      first_token_in_line = false  -- no longer the first one
       cur_level = level  -- reset level buffer
       -- print(attr, val, level, anchor, p.dump(link)) 
     end
