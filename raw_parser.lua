@@ -14,9 +14,9 @@ p.parse = function(raw, given_data)
     if not heading_space then heading_space = "" end
     local _, level = string.gsub(heading_space, '\t', "")  -- count level by tab
     if not level then level = 0 end
-    for token in string.gmatch(line, "%[[%a%d_: ]+%]") do
+    for token in string.gmatch(line, "%[[^%]]+%]") do
 
-      l, r = token:find("%[[%a_]+")
+      l, r = token:find("%[[^:%]]+")
       attr = token:sub(l+1, r)  -- acquire attr
       l, r = token:find(':.*]')  -- find the end of token
       if l then
@@ -90,7 +90,7 @@ p.plug_value = function(cursor, attr, value)
   if string.find(val, ':') then  -- colon still exists
     local val_table = {}  -- store separated value
     while #val > 0 do
-      local _, r = string.find(val, "[%a%d_ ]+")  -- usually the left one is 1
+      local _, r = string.find(val, "[^:%]]+")  -- usually the left one is 1
       if r then
         table.insert(val_table, string.sub(val, 1, r))
         val = val:sub(r+2)
