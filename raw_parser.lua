@@ -41,16 +41,25 @@ p.parse = function(raw, dict, given_data)
         val = type  -- set value as item type
         entry = attr
         data[attr] = {}
-        parent = ""
+        parent = "" -- clear parent token
         break
       end
 
       -- plug token into database
       if p.is_token(dict, attr) then
-        parent = attr
-        parent_key = p.plug_value(data[entry], attr, val)
+        local is_parent = false
+        if not (next(dict[attr]) == nil) then
+          is_parent = true
+        end
+        -- only update parent key when it has sub-tokens
+        if is_parent then
+          parent = attr
+          parent_key = p.plug_value(data[entry], attr, val, true)
+        else
+          p.plug_value(data[entry], attr, val) -- do not update parent_keys
+        end
       elseif p.is_token(dict, attr, parent) then
-        p.plug_value(data[entry][parent_key], attr, val)
+        p.plug_value(data[entry][parent_key], attr, val)  -- sub-token cannot be parent
       else
         print('[WARNING] ' .. attr .. ' is not reconized, ignore')
       end
@@ -85,7 +94,7 @@ p.is_color = function( a, b, c )
   return false
 end
 
-p.plug_value = function(cursor, attr, value)
+p.plug_value = function(cursor, attr, value, is_parent)
 
   -- check if multiple values exist
   local val = value
@@ -138,16 +147,23 @@ p.plug_value = function(cursor, attr, value)
 
   -- plug in key-val pair
   -- check multiple definition
-  if cursor[key] then
-    if type(cursor[key].val) == "table" then
-      table.insert(cursor[key].val, val)
-    else  -- second value, create a table
-      cursor[key].val = {cursor[key].val, val}
+  if not cursor[key] then
+    if is_parent then
+      cursor[key] = {}  -- create a table first
+      cursor[key].THIS = val -- the value of token itself is store in THIS
+    else
+      cursor[key] = val -- no sub-tokens, just plug in the value
     end
-  else  -- default case
-    cursor[key] = {}
-    cursor[key].val = val 
-    cursor[key].tab = {}
+  else -- key already exists, multiple values
+    local cursor2 = cursor[key]
+    if is_parent then
+      cursor2 = cursor2.THIS
+    end
+    if type(cursor2) == "table" then
+      table.insert(cursor2, val)
+    else  -- only the second value, create a table
+      cursor2 = {cursor2, val}
+    end
   end
 
   return key  -- for modification
