@@ -2,8 +2,9 @@ local p = {}
 
 p.getRaw = function (db, name, token1, token2)
     local data = mw.loadData('Module:raw/' .. db)
+    local dict = mw.loadData('Module:raw/' .. db .. '_tokens')
     if not data[name] then return nil end
-    local token_db = data[name].tab
+    local token_db = data[name]
     if not token1 then token1 = 'NAME' end  -- default token
     if not token2 then
     	if token_db[token1] then
