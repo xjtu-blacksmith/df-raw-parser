@@ -32,7 +32,6 @@ p.parse = function(raw, dict, given_data)
       -- add item (attr - val) to database
       if attr == "OBJECT" then
         type = val
-        data[type] = {}
         break  -- directly move to next line
       end
       
@@ -41,7 +40,7 @@ p.parse = function(raw, dict, given_data)
         attr = val
         val = type  -- set value as item type
         entry = attr
-        data[type][attr] = {}
+        data[attr] = {}
         parent = ""
         break
       end
@@ -49,9 +48,9 @@ p.parse = function(raw, dict, given_data)
       -- plug token into database
       if p.is_token(dict, attr) then
         parent = attr
-        parent_key = p.plug_value(data[type][entry], attr, val)
+        parent_key = p.plug_value(data[entry], attr, val)
       elseif p.is_token(dict, attr, parent) then
-        p.plug_value(data[type][entry][parent_key], attr, val)
+        p.plug_value(data[entry][parent_key], attr, val)
       else
         print('[WARNING] ' .. attr .. ' is not reconized, ignore')
       end
