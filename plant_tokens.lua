@@ -10,7 +10,6 @@ return {
     ['USE_MATERIAL_TEMPLATE'] = {
         ['MATERIAL_VALUE'] = {},
         ['MATERIAL_REACTION_PRODUCT'] = {},
-        ['BASIC_MAT'] = {},
         ['EDIBLE_VERMIN'] = {},
         ['EDIBLE_RAW'] = {},
         ['EDIBLE_COOKED'] = {},
@@ -32,6 +31,7 @@ return {
         ['POWDER_DYE'] = {},
     },
     -- product info
+    ['BASIC_MAT'] = {},
     ['DRINK'] = {},
     ['THREAD'] = {},
     ['SEED'] = {},
