@@ -114,21 +114,27 @@ p.plug_value = function(cursor, attr, value)
 
   -- check template
   local key = attr
-  local special_keys = { 'USE_MATERIAL_TEMPLATE', 'STATE_NAME_ADJ', 'GROWTH' }
-  for _, special_key in ipairs(special_keys) do
+  local special_keys = {
+    ['USE_MATERIAL_TEMPLATE'] = 2,
+    ['STATE_NAME_ADJ'] = 1,
+    ['GROWTH'] = 1,
+  }
+  for special_key, sp_idx in pairs(special_keys) do
     if key == special_key then
       if type(val) == 'string' then
         key = key .. '/' .. val
       else
-        key = key .. '/' .. val[2]  -- connect the key with the template type
-        table.remove(val, 2) -- remove template type name from table
+        key = key .. '/' .. val[sp_idx]  -- connect the key with the template type
+        table.remove(val, sp_idx) -- remove template type name from table
       end
       break
     end
   end
 
   -- if only one element, reset to single val
-  if #val == 1 then val = val[1] end
+  if type(val) == table and #val == 1 then
+    val = val[1]
+  end
 
   -- plug in key-val pair
   -- check multiple definition
