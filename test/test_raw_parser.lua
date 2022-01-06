@@ -23,3 +23,5 @@ f:write('return ' .. p.dump(data))
 f:close()
 
 -- test data info
+print(data['MUSHROOM_HELMET_PLUMP']['BASIC_MAT'][2])  -- STRUCTURAL
+print(data['MUSHROOM_HELMET_PLUMP']['USE_MATERIAL_TEMPLATE/SEED_TEMPLATE']['EDIBLE_COOKED'])  -- TRUE
