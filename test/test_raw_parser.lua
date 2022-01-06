@@ -1,5 +1,6 @@
 package.path = './?.lua'
 p = require('raw_parser')
+dict = require('plant_tokens')
 data = {}
 files = {
     'plant_crops.txt',
@@ -11,7 +12,7 @@ files = {
 for _, file in ipairs(files) do
     -- read raw file
     raw = p.read_file('raw/' .. file)
-    data = p.parse(raw, data)
+    data = p.parse(raw, dict, data)
     print(file .. ' processed!')
 end
 

@@ -1,19 +1,22 @@
 local p = {}
 
-p.parse = function(raw, given_data)
+p.parse = function(raw, dict, given_data)
   local data = given_data
   if not data then  -- data not given, create from empty table
     data = {}
   end
-  local cur_level = 0
+  -- local cur_level = 0
   local link = {}  -- buffer for current parents' link
   local anchor = ""  -- last anchor to be added
   local type = ""
+  local entry = ""
+  local parent = ""  -- for sub_tokens
+  local parent_key = ""
   for i, line in ipairs(raw) do
     local heading_space = string.match(line, "^%s+")
     if not heading_space then heading_space = "" end
-    local _, level = string.gsub(heading_space, '\t', "")  -- count level by tab
-    if not level then level = 0 end
+    -- local _, level = string.gsub(heading_space, '\t', "")  -- count level by tab
+    -- if not level then level = 0 end
     for token in string.gmatch(line, "%[[^%]]+%]") do
 
       l, r = token:find("%[[^:%]]+")
@@ -29,34 +32,31 @@ p.parse = function(raw, given_data)
       -- add item (attr - val) to database
       if attr == "OBJECT" then
         type = val
+        data[type] = {}
         break  -- directly move to next line
       end
-      if level == 0 then
-        if attr == type then  -- basic item
-          attr = val
-          val = type  -- set value as item type
-          link = {}  -- clear link list
-        else  -- not basic item, absent tab appears
-          level = 1
-        end
-      end
-
-      -- processing link list
-      if level > cur_level then  -- lower level, add last anchor to link
-        table.insert(link, anchor)
-      elseif level < cur_level then  -- rollback to higher level
-        for _ = level, cur_level-1 do
-          table.remove(link, #link)  -- rollback to the level on the top
-        end
+      
+      -- entry name
+      if attr == type then
+        attr = val
+        val = type  -- set value as item type
+        entry = attr
+        data[type][attr] = {}
+        parent = ""
+        break
       end
 
       -- plug token into database
-      local cursor = p.fw_link(data, link)
-      attr = p.plug_value(cursor, attr, val)
-      anchor = attr -- reset the anchor
+      if p.is_token(dict, attr) then
+        parent = attr
+        parent_key = p.plug_value(data[type][entry], attr, val)
+      elseif p.is_token(dict, attr, parent) then
+        p.plug_value(data[type][entry][parent_key], attr, val)
+      else
+        print('[WARNING] ' .. attr .. ' is not reconized, ignore')
+      end
 
-      cur_level = level  -- reset level buffer
-      -- print(attr, val, level, anchor, p.dump(link)) 
+      -- print(attr, val, parent) 
     end
   
   -- if i > 50 then break end
@@ -64,12 +64,15 @@ p.parse = function(raw, given_data)
   return data
 end
 
-p.fw_link = function(data, link)
-  local cursor = data
-  for i = 1, #link do
-    cursor = cursor[link[i]].tab
+p.is_token = function(dict, token, parent)
+  if dict[token] then
+    return true
+  elseif parent then
+    if (not (parent == "")) and dict[parent][token] then
+      return true
+    end
   end
-  return cursor
+  return false
 end
 
 p.is_color = function( a, b, c )
