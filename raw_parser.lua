@@ -141,7 +141,7 @@ p.plug_value = function(cursor, attr, value, is_parent)
   end
 
   -- if only one element, reset to single val
-  if type(val) == table and #val == 1 then
+  if type(val) == 'table' and #val == 1 then
     val = val[1]
   end
 
