@@ -13,8 +13,8 @@ p.getRaw = function (db, name, token1, token2)
         	return nil
         end
     else
-        if token_db[token1] and token_db[token1].tab[token2] then
-        	return token_db[token1].tab[token2] -- second level
+        if token_db[token1] and token_db[token1][token2] then
+        	return token_db[token1][token2] -- second level
         else
         	return nil
         end
@@ -43,8 +43,8 @@ p.tagValue = function (frame)
     local token1 = args[3]
     local token2 = args[4]
     local token = p.getRaw (db, name, token1, token2)
-    if token and token.val then
-        return token.val
+    if token then
+        return token
     else
         return ""
     end
@@ -60,8 +60,8 @@ p.tagEntry = function( frame )
     local token_name = args[3]
     local index = args[4]
     local token = p.getRaw (db, name, token_name)
-    if token and token.val then
-        return token.val[index]
+    if token then
+        return token[index]
     else
         return ""
     end
@@ -77,7 +77,7 @@ p.tag = function( frame )
     local token1 = args[3]
     local token2 = args[4]
     local token = p.getRaw (db, name, token1, token2)
-    if token and token.val then  -- tag exists
+    if token then  -- tag exists
         return "true"  -- representing true
     else
         return ""  -- empty string means false for wikitext
@@ -93,7 +93,7 @@ p.getStateDescription = function ( frame )
     local entry = args[2]
     local state = args[3]
     if entry == 'NAME' then
-        return token.val['STATE_NAME_ADJ/' .. state].val
+        return token['STATE_NAME_ADJ/' .. state]
     end
     return ""  -- default: empty string
 end
