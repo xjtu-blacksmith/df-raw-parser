@@ -84,18 +84,4 @@ p.tag = function( frame )
     end
 end
 
-p.getStateDescription = function ( frame )
-    local args = frame.args
-	if frame == mw.getCurrentFrame() then
-		args = frame:getParent().args
-	end
-    local token = args[1]
-    local entry = args[2]
-    local state = args[3]
-    if entry == 'NAME' then
-        return token['STATE_NAME_ADJ/' .. state]
-    end
-    return ""  -- default: empty string
-end
-
 return p
