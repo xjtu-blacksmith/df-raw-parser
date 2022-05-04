@@ -69,6 +69,7 @@ return {
     ['DRY'] = {},
     ['BIOME'] = {},
     ['UNDERGROUND_DEPTH'] = {},
+    -- biome alignment info
     ['GOOD'] = {},
     ['EVIL'] = {},
     ['SAVAGE'] = {},
