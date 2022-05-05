@@ -92,4 +92,15 @@ p.tag = function( frame )
     end
 end
 
+p.trans = function (frame)
+    local args = frame.args
+    if frame == mw.getCurrentFrame() then
+		args = frame:getParent().args
+	end
+    local token = args[1]  -- only one param
+    local dict = mw.loadData('Module:raw/token_dict')
+    local trans_res = dict[token]  -- directly lookup dict (table)
+    if trans_res then return trans_res else return "" end
+end
+
 return p
