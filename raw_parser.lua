@@ -123,11 +123,15 @@ p.plug_value = function(cursor, attr, value, is_parent)
 
   -- check template
   local key = attr
+  -- key names to reduce redundancy
   local special_keys = {
     ['USE_MATERIAL_TEMPLATE'] = 2,
     ['STATE_NAME_ADJ'] = 1,
     ['GROWTH'] = 1,
+    ['METAL_ORE'] = 2,
   }
+  -- key names to make list
+  local list_keys = { 'ENVIRONMENT' }
   for special_key, sp_idx in pairs(special_keys) do
     if key == special_key then
       if type(val) == 'string' then
@@ -137,6 +141,21 @@ p.plug_value = function(cursor, attr, value, is_parent)
         table.remove(val, sp_idx) -- remove template type name from table
       end
       break
+    end
+  end
+  for i, list_key in ipairs(list_keys) do
+    if key == list_key then
+      if not cursor[key] then
+        cursor[key] = {}
+      end
+      cursor = cursor[key]
+      if type(val) == 'string' then
+        key = val
+        val = 'TRUE'
+      else
+        key = val[1]
+        table.remove(val, 1)
+      end
     end
   end
 
@@ -209,6 +228,9 @@ p.dump = function(value, call_indent, compress)
     output = "userdata"
   else 
     if tonumber(value) or not value then output = value
+    elseif (#value == 3) and (string.find(value, "'.*'")) then  -- symbol with quotes
+      value = string.sub(value, 2, 2)
+      output = string.byte(value)  -- other symbol: remove symbol
     else output = '"' .. value .. '"' end
   end
   return output 
