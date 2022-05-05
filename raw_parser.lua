@@ -128,10 +128,9 @@ p.plug_value = function(cursor, attr, value, is_parent)
     ['USE_MATERIAL_TEMPLATE'] = 2,
     ['STATE_NAME_ADJ'] = 1,
     ['GROWTH'] = 1,
-    ['METAL_ORE'] = 2,
   }
   -- key names to make list
-  local list_keys = { 'ENVIRONMENT' }
+  local list_keys = { 'ENVIRONMENT', 'ENVIRONMENT_SPEC', 'METAL_ORE', 'THREAD_METAL' }
   for special_key, sp_idx in pairs(special_keys) do
     if key == special_key then
       if type(val) == 'string' then
@@ -152,7 +151,7 @@ p.plug_value = function(cursor, attr, value, is_parent)
       if type(val) == 'string' then
         key = val
         val = 'TRUE'
-      else
+      else  -- elevate the first element of val table to be the new key
         key = val[1]
         table.remove(val, 1)
       end

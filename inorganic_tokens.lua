@@ -3,6 +3,7 @@ return {
     ['USE_MATERIAL_TEMPLATE'] = {
         ['STATE_NAME_ADJ'] = {},
         ['ENVIRONMENT'] = {},
+        ['ENVIRONMENT_SPEC'] = {},
     },
     ['ADJ'] = {},
     ['PREFSTRING'] = {},
@@ -13,5 +14,7 @@ return {
     ['DISPLAY_COLOR'] = {},
     ['BASIC_COLOR'] = {},
     ['IS_STONE'] = {},
-    ['REACTION_CLASS'] = {}
+    ['REACTION_CLASS'] = {},
+    ['METAL_ORE'] = {},
+    ['THREAD_METAL'] = {},
 }
