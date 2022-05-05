@@ -2,7 +2,6 @@ local p = {}
 
 p.getRaw = function (db, name, token1, token2)
     local data = mw.loadData('Module:raw/' .. db)
-    local dict = mw.loadData('Module:raw/' .. db .. '_tokens')
     if not data[name] then return nil end
     local token_db = data[name]
     if not token1 then token1 = 'NAME' end  -- default token
@@ -58,10 +57,19 @@ p.tagEntry = function( frame )
     local db = args[1]
     local name = args[2]
     local token_name = args[3]
-    local index = args[4]
-    local token = p.getRaw (db, name, token_name)
-    if token then
-        return token[index]
+    local index = 0
+    local token2 = ""
+    local token = {}
+    if tonumber(args[4]) then
+      index = args[4]
+      token = p.getRaw (db, name, token_name)
+    else
+      token2 = args[4]
+      index = args[5]
+      token = p.getRaw (db, name, token_name, token2)
+    end
+    if token and (type(token)=="table") then
+        return token[tostring(index)]  -- consider the case when non-number index exists
     else
         return ""
     end
