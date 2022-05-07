@@ -14,7 +14,18 @@ return {
     ['DISPLAY_COLOR'] = {},
     ['BASIC_COLOR'] = {},
     ['IS_STONE'] = {},
+    ['IS_GEM'] = {},
     ['REACTION_CLASS'] = {},
     ['METAL_ORE'] = {},
     ['THREAD_METAL'] = {},
+    -- properties
+    ['MATERIAL_VALUE'] = {},
+    ['MELTING_POINT'] = {},
+    ['IGNITE_POINT'] = {},
+    ['SOLID_DENSITY'] = {},
+    ['SPEC_HEAT'] = {},
+    -- layer properties
+    ['SEDIMENTARY_OCEAN_SHALLOW'] = {},
+    ['SEDIMENTARY_OCEAN_FLOOR'] = {},
+    ['AQUIFER'] = {},
 }
