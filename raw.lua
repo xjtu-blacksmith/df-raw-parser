@@ -77,22 +77,15 @@ end
 
 p.tagFor = function ( frame )
     local args = frame.args
-    if frame == mw.getCurrentFrame() then
-        args = frame:getParent().args
-    end
+	if frame == mw.getCurrentFrame() then
+		args = frame:getParent().args
+	end
     local db = args[1]
     local name = args[2]
-    local token = args[3]
-    local pattern = ""
-    local list = {}
-    if #args == 4 then
-        pattern = args[4]
-        list = p.getRaw (db, name, token)
-    else
-        local token2 = args[4]
-        pattern = args[5]
-        list = p.getRaw (db, name, token, token2)
-    end
+    local pattern = args[3]
+    local token1 = args[4]
+    local token2 = args[5]  -- may be empty
+    local list = p.getRaw (db, name, token1, token2)
     local res = {}
     -- replace the pattern with keys and values
     if list then
