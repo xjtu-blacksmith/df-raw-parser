@@ -3,7 +3,12 @@ p = require('raw_parser')
 dict = require('inorganic_tokens')
 data = {}
 files = {
-    'inorganic_stone_mineral.txt'
+    'inorganic_stone_mineral.txt',
+    'inorganic_stone_gem.txt',
+    'inorganic_stone_layer.txt',
+    'inorganic_stone_soil.txt',
+    'inorganic_metal.txt',
+    'inorganic_other.txt',
 }
 for _, file in ipairs(files) do
     -- read raw file
@@ -14,7 +19,6 @@ end
 
 -- write out data
 f = io.output('out/inorganic.lua')
--- f:write('return ' .. p.dump(data))
 f:write('return ' .. p.dump(data, "", true))
 f:close()
 
