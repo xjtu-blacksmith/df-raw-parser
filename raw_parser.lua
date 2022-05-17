@@ -160,6 +160,7 @@ p.plug_value = function(cursor, attr, value, is_parent)
   end
 
   -- if only one element, reset to single val
+  local parallel_keys = { 'BODY_SIZE' }
   if type(val) == 'table' and #val == 1 then
     val = val[1]
   end
@@ -179,7 +180,18 @@ p.plug_value = function(cursor, attr, value, is_parent)
       cursor2 = cursor2.THIS
     end
     if type(cursor2) == "table" then
-      table.insert(cursor2, val)
+      local parallel = false
+      for _, para_key in ipairs(parallel_keys) do
+        if key == para_key and type(val) == 'table' then
+          for i = 1, #val do
+            table.insert(cursor2, val[i])
+          end
+          parallel = true 
+        end
+      end
+      if not parallel then
+        table.insert(cursor2, val)
+      end
     else  -- only the second value, create a table
       cursor2 = {cursor2, val}
     end
