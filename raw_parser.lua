@@ -126,6 +126,7 @@ p.plug_value = function(cursor, attr, value, is_parent)
   -- key names to reduce redundancy
   local special_keys = {
     ['USE_MATERIAL_TEMPLATE'] = 2,
+    ['SELECT_MATERIAL'] = 1,
     ['STATE_NAME_ADJ'] = 1,
     ['GROWTH'] = 1,
   }
