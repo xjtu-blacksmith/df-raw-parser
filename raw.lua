@@ -151,4 +151,18 @@ p.trans = function (frame)
 	end
 end
 
+p.tagType = function (frame)
+    local args = frame.args
+    if frame == mw.getCurrentFrame() then
+        args = frame:getParent().args
+    end
+    local db = args[1]
+    local name = args[2]
+    local token1 = args[3]
+    local token2 = args[4]
+    local token = o.getRaw(db, name, token1, token2)
+    local typestr = type(token)
+    return typestr
+end
+
 return p
