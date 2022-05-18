@@ -41,11 +41,14 @@ p.tagValue = function (frame)
     local name = args[2]
     local token1 = args[3]
     local token2 = args[4]
+    local notfound = args["notfound"]
     local token = p.getRaw (db, name, token1, token2)
     if token then
         return token
+    elseif notfound then
+        return notfound
     else
-        return ""
+    	return ""
     end
 end
 
@@ -68,10 +71,13 @@ p.tagEntry = function( frame )
       index = args[5]
       token = p.getRaw (db, name, token_name, token2)
     end
+    local notfound = args["notfound"]
     if token and (type(token)=="table") then
         return token[tostring(index)]  -- consider the case when non-number index exists
+    elseif notfound then
+        return notfound
     else
-        return ""
+    	return ""
     end
 end
 
@@ -91,10 +97,17 @@ p.tagFor = function ( frame )
     if list then
         for k, v in pairs(list) do
             local element = tostring(pattern)
-            element = string.gsub(element, '\\1', tostring(k))
-            element = string.gsub(element, '\\2', tostring(v))
-            element = string.gsub(element, '\\t1', tostring(p.trans({args={k}})))
-            element = string.gsub(element, '\\t2', tostring(p.trans({args={v}})))
+            element = string.gsub(element, '\\0', tostring(k))
+            element = string.gsub(element, '\\t0', tostring(p.trans({args={k}})))
+            if (type(v) == 'table') then -- value as a table
+	        	for i = 1,9 do
+	        		element = string.gsub(element, '\\' .. tostring(i), tostring(v[tostring(i)]))
+	        		element = string.gsub(element, '\\t' .. tostring(i), tostring(p.trans({args={v[tostring(i)]}})))
+        		end
+	        else
+	            element = string.gsub(element, '\\1', tostring(v))
+	            element = string.gsub(element, '\\t1', tostring(p.trans({args={v}})))
+        	end
             table.insert(res, element)
         end
         return table.concat(res)
@@ -126,9 +139,16 @@ p.trans = function (frame)
 		args = frame:getParent().args
 	end
     local token = args[1]  -- only one param
+    if not token then -- empty token
+    	return ""
+	end
     local dict = mw.loadData('Module:raw/token_dict')
     local trans_res = dict[token]  -- directly lookup dict (table)
-    if trans_res then return trans_res else return token end
+    if trans_res then
+    	return trans_res
+    else
+    	return token
+	end
 end
 
 return p
